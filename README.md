@@ -9,13 +9,20 @@ TAKWatch is an ATAK plugin that communicates with Garmin devices running TAKWatc
 
 TAKWatch is an ATAK plugin, not a standalone Android application. Building it requires:
 
-- JDK 17 (JDK 8 is not supported by Android Gradle Plugin 7.4.2)
+- JDK 11 or 17 (JDK 8 is not supported by Android Gradle Plugin 7.4.2)
 - Android SDK platform 33
 - Android build tools 30.0.3
 - The ATAK 4.10.0 CIV plugin development kit
-- Garmin Connect IQ Android SDK 2.0.3 (the AAR dependency is already declared in `app/build.gradle`)
 
-The ATAK Gradle plugin must be available either as a local JAR or through an ATAK Maven repository. By default, the project looks for the JAR at `../../atak-gradle-takdev.jar` relative to the project root. Alternatively, create `local.properties` in the project root and configure the ATAK repository:
+The Garmin Connect IQ companion SDK is resolved automatically from Maven Central.
+
+The ATAK Gradle plugin must be available either as a local JAR or through an ATAK Maven repository. By default, the project looks for `atak-gradle-takdev.jar` two directories above the project root. To use a different location, create `local.properties` in the project root:
+
+```properties
+takdev.plugin=C:/path/to/atak-gradle-takdev.jar
+```
+
+Alternatively, configure an ATAK Maven repository in `local.properties`:
 
 ```properties
 takrepo.url=https://your-atak-maven-repository/
@@ -23,23 +30,33 @@ takrepo.user=your-username
 takrepo.password=your-password
 ```
 
-With the required tools configured, run the CIV debug build from the project root:
+With the required tools configured, run the CIV debug build from the project root.
+
+On Windows:
 
 ```bat
-gradlew.bat assembleCivDebug
+.\gradlew.bat assembleCivDebug
 ```
 
-For a release APK, run:
+On macOS or Linux:
 
-```bat
-gradlew.bat assembleCivRelease
+```sh
+./gradlew assembleCivDebug
 ```
 
-The generated APK is written below `app\build\outputs\apk\`. The exact filename includes the plugin version, ATAK version, flavor, and build type.
+Replace `assembleCivDebug` with `assembleCivRelease` to create a release build.
 
-Install the resulting APK through ATAK's plugin installer or copy it to the target device and open it with ATAK. It must be installed on a device that has a compatible ATAK CIV version; it is not launched as a normal standalone app.
+The generated APK is written to `app/build/outputs/apk/civ/debug/` or `app/build/outputs/apk/civ/release/`. Its filename includes the plugin version, source revision, ATAK version, flavor, and build type.
 
-If the ATAK Dev Kit is not installed, Gradle fails with `Plugin with id 'atak-takdev-plugin' not found`. The repository's existing release APK can be downloaded from the [v1.0.0 release](https://github.com/TDF-PL/TAKWatch/releases/tag/v1.0.0).
+Install the APK through ATAK's plugin manager or copy it to the target device and open it with ATAK. The device must have the compatible ATAK CIV version installed; TAKWatch cannot be launched as a standalone app.
+
+If the ATAK Dev Kit is not configured, Gradle fails with an error similar to:
+
+```text
+Plugin with id 'atak-takdev-plugin' not found
+```
+
+Prebuilt APKs are available on the [v1.0.0 release page](https://github.com/TDF-PL/TAKWatch/releases/tag/v1.0.0).
 
 ## Features
 - Sending heart rate to ATAK
